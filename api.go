@@ -69,6 +69,7 @@ func ApiHandler(w http.ResponseWriter, r *http.Request) {
 		if AnimetionGif == false {
 			w.Write([]byte(CreateAnimationGif(p.Params)))
 			AnimetionGif = true
+			return
 		}
 		stopCall <- true
 		AnimetionGif = false

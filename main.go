@@ -290,25 +290,23 @@ func ChangeTarget(setHwnd uintptr) bool {
 
 	breakCounter := 10
 
-	if Cli == false {
-		for {
-			if cliHwnd != winctl.GetWindow("GetForegroundWindow", Debug) {
-				winctl.SetActiveWindow(winctl.HWND(cliHwnd), Debug)
-				time.Sleep(time.Duration(100) * time.Millisecond)
-			} else {
-				break
-			}
-			breakCounter--
-			if breakCounter == 0 {
-				break
-			}
+	for {
+		if cliHwnd != winctl.GetWindow("GetForegroundWindow", Debug) {
+			winctl.SetActiveWindow(winctl.HWND(cliHwnd), Debug)
+			time.Sleep(time.Duration(100) * time.Millisecond)
+		} else {
+			break
+		}
+		breakCounter--
+		if breakCounter == 0 {
+			break
 		}
 	}
 
 	breakCounter = 10
 
 	for {
-		if targetHwnd != winctl.GetWindow("GetForegroundWindow", Debug) {
+		if setHwnd != winctl.GetWindow("GetForegroundWindow", Debug) {
 			winctl.SetActiveWindow(winctl.HWND(setHwnd), Debug)
 			time.Sleep(time.Duration(100) * time.Millisecond)
 		} else {
