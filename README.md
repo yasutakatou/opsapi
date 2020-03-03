@@ -126,7 +126,7 @@ example) [ops test] (keyboard emulaton to your terminal. input "test")<br>
 |ctrl+|ctrl key push at same time. example [ops ctrl+s] = ctrl&s|
 |alt+|alt key push at same time. example [ops alt+a] = ctrl&a|
 |\\\\n|enter, newline|
-|\\\\\\|backslash|
+|\\\\\ |backslash|
 |\\\\b|backspace|
 |\\\\t|tab|
 |\\\\"|double quote|
@@ -214,6 +214,12 @@ if you want insert tab input before "\n", you input [insertHistory 2 \\t]
 note: when "runHistory" running, not add history.
 
 ## config
+
+*note: if space string include, refer following.*
+
+```
+>>> cliConfigSet Shebang="## space string include example ##"
+```
 
 ### "Target" (default: "Chrome". exists window title, or handle id.)
 if you run "ops", keyboard emulation do to application of this value. you can set title of window, or id of handle.<br>
