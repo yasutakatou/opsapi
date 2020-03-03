@@ -147,18 +147,15 @@ func main() {
 		Token = RandStr(8)
 	}
 
-	if Debug == true {
-		if runtime.GOOS == "linux" {
-			fmt.Println(" - - - OS: Linux - - -")
-		} else if runtime.GOOS == "windows" {
-			fmt.Println(" - - - OS: Windows - - -")
-
-			cliHwnd = winctl.GetWindow("GetForegroundWindow", Debug)
-			targetHwnd = winctl.FocusWindow(targetHwnd, cliHwnd, config.Target, Debug)
-		} else {
-			fmt.Println("Error: not support this os.")
-			os.Exit(-1)
-		}
+	if runtime.GOOS == "linux" {
+		fmt.Println(" - - - OS: Linux - - -")
+	} else if runtime.GOOS == "windows" {
+		fmt.Println(" - - - OS: Windows - - -")
+		cliHwnd = winctl.GetWindow("GetForegroundWindow", Debug)
+		targetHwnd = winctl.FocusWindow(targetHwnd, cliHwnd, config.Target, Debug)
+	} else {
+		fmt.Println("Error: not support this os.")
+		os.Exit(-1)
 	}
 
 	if Cli == false {
