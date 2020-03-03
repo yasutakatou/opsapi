@@ -98,7 +98,7 @@ type responseListData struct {
 func init() {
 	rand.Seed(time.Now().UnixNano())
 
-	config.Target = "sakura"
+	config.Target = "Chrome"
 	config.AutoCapture = false
 	config.CapturePath = ""
 	config.SeparateChar = ";"

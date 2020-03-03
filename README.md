@@ -215,7 +215,7 @@ note: when "runHistory" running, not add history.
 
 ## config
 
-### "Target" (default: "sakura". exists window title, or handle id.)
+### "Target" (default: "Chrome". exists window title, or handle id.)
 if you run "ops", keyboard emulation do to application of this value. you can set title of window, or id of handle.<br>
 *note: value can get by "titles" function. also, value can set partially included. if not found value, return error.*<br>
 
@@ -278,14 +278,18 @@ curl -H "Content-type: application/json" -X POST http://127.0.0.1:8080/ -d "{\"t
 
 ## consideration
 
-*if more request, i consider to implementation*.<br>
+*if more request, I consider to implementation*.<br>
 
  - animetion gif is split save, and finally merge to one file.
  
 therefore, can more record at long time. I don't know how, append gif data after once save on golang.<br>
-not impossible to use external command (FFmpeg such more), but i don't like.<br>
+not impossible to use external command (FFmpeg such more), but I don't like.<br>
 (you must prepare external command, not one binary environment.)
 
  - see to real time operating screen from remote  client (such use websocket).
 
 if you do that, I suggest to use RDP, VNC.
+
+ -  implement special keycode. (Upper, Lower, Right, Left, Page Up/Dn...)
+
+in case of in browser control,  when use scroll, lower key not, space key is not it?  that's why. (may be my misunderstanding)
