@@ -37,18 +37,16 @@ func TestRunHistory(t *testing.T) {
 		t.Errorf("why? your history is not empty")
 	}
 
-	cliConfig.Record = true
-	cliConfig.Shebang = ""
-	History = append(History, historyData{Command: "cliConfigSet", Params: "Record=true"})
+	config.Record = true
+	config.Shebang = ""
+	History = append(History, historyData{Command: "configSet", Params: "Record=true"})
 
 	if runtime.GOOS == "linux" {
-		resp := InsertHistory("1 exec ls>test.txt")
-		if resp.Status == "Error" {
+		if InsertHistory("1 exec ls>test.txt") == false {
 			t.Errorf("can't insert your history")
 		}
 	} else {
-		resp := InsertHistory("1 exec winver")
-		if resp.Status == "Error" {
+		if InsertHistory("1 exec winver") == false {
 			t.Errorf("can't insert your history")
 		}
 	}
@@ -185,8 +183,8 @@ func TestLiveRecord(t *testing.T) {
 
 	cliHwnd = winctl.GetWindow("GetForegroundWindow", Debug)
 
-	cliConfig.LiveExitAsciiCode = 32
-	cliConfig.Record = true
+	config.LiveExitAsciiCode = 32
+	config.Record = true
 	Cli = true
 
 	RunCliCmd("exec", "winver")

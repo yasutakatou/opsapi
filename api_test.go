@@ -53,20 +53,11 @@ func TestJsonResponseToByte(t *testing.T) {
 func TestConfigToByte(t *testing.T) {
 	var apiTest configData
 
-	if err := json.Unmarshal(ConfigToByte(false), &apiTest); err != nil {
+	if err := json.Unmarshal(ConfigToByte(), &apiTest); err != nil {
 		t.Errorf("can't convert config in json to []byte")
 	}
 	if apiTest.SeparateChar != ";" || apiTest.AutoCapture != false {
 		t.Errorf("can't set config in json to []byte")
-	}
-
-	var cliTest cliConfigData
-
-	if err := json.Unmarshal(ConfigToByte(true), &cliTest); err != nil {
-		t.Errorf("can't convert cliconfig in json to []byte")
-	}
-	if cliTest.LiveExitAsciiCode != 27 || cliTest.LoopWait != 500 {
-		t.Errorf("can't set cliconfig in json to []byte")
 	}
 }
 

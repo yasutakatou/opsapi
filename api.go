@@ -60,51 +60,55 @@ func ApiHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if checkLinuxFunction(p.Command) == true {
+		w.Write(JsonResponseToByte("Error", "Error: ("+p.Command+") command can't use on linux"))
+		return
+	}
+
 	switch p.Command {
 	case "AnimetionGif":
-		if runtime.GOOS == "linux" {
-			w.Write(JsonResponseToByte("Error", "Error: ("+p.Command+") command can't use on linux"))
-			return
-		}
-		if AnimetionGif == false {
-			w.Write([]byte(CreateAnimationGif(p.Params)))
-			AnimetionGif = true
-			return
-		}
-		stopCall <- true
-		AnimetionGif = false
+		w.Write([]byte(AnimetionSwitch(p.Params)))
 	case "configGet":
-		w.Write(ConfigToByte(false))
+		w.Write(ConfigToByte())
 	case "configSet":
 		ret := SetOptions(p.Params)
 		if ret != "" {
 			w.Write(JsonResponseToByte("Error", ret))
 			return
 		}
-		if Cli == true && cliConfig.Record == true {
-			History = append(History, historyData{Command: p.Command, Params: p.Params})
-		}
-		w.Write(ConfigToByte(false))
+		w.Write(ConfigToByte())
 	case "ops":
 		StringDo(p.Params)
 		w.Write(JsonResponseToByte("Success", ""))
 	case "exec":
-		if Debug == true {
-			w.Write(JsonResponseToByte("Success", string(Execmd(p.Params))))
-		} else {
-			Execmd(p.Params)
-		}
+		w.Write(JsonResponseToByte("Success", string(Execmd(p.Params))))
 	case "capture":
 		w.Write(JsonResponseToByte("Success", CaptureOnly(p.Params)))
 	case "titles":
-		if runtime.GOOS == "linux" {
-			w.Write(JsonResponseToByte("Error", "Error: ("+p.Command+") command can't use on linux"))
-			return
-		}
 		w.Write(ListToByte(true))
 	default:
 		w.Write(JsonResponseToByte("Error", "command of you called isn't implement"))
 	}
+}
+
+func checkLinuxFunction(params string) bool {
+	if runtime.GOOS == "linux" {
+		switch params {
+		case "AnimationDelay":
+			return true
+		case "AnimationDuration":
+			return true
+		case "ReturnWindow":
+			return true		
+		case "Target":
+			return true
+		case "AnimetionGif":
+			return true
+		case "titles":
+			return true
+		}
+	}
+	return false
 }
 
 func ListToByte(statusFlag bool) []byte {
@@ -140,15 +144,19 @@ func JsonResponseToByte(status, message string) []byte {
 	return []byte(outputJson)
 }
 
-func ConfigToByte(cli bool) []byte {
+func ConfigToByte() []byte {
 	var outputJson []byte
 	var err error
 
-	if cli == true {
-		outputJson, err = json.Marshal(&cliConfigData{LiveExitAsciiCode: cliConfig.LiveExitAsciiCode, Shebang: cliConfig.Shebang, ExportFormat: cliConfig.ExportFormat, Record: cliConfig.Record, LoopWait: cliConfig.LoopWait})
-	} else {
-		if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" {
+		if Cli == true {
+			outputJson, err = json.Marshal(&configData{Target: config.Target, AutoCapture: config.AutoCapture, CapturePath: config.CapturePath, SeparateChar: config.SeparateChar, ReturnWindow: config.ReturnWindow, AnimationDuration: config.AnimationDuration, AnimationDelay: config.AnimationDelay, LiveExitAsciiCode: config.LiveExitAsciiCode, Shebang: config.Shebang, ExportFormat: config.ExportFormat, Record: config.Record, LoopWait: config.LoopWait})
+		} else {
 			outputJson, err = json.Marshal(&configData{Target: config.Target, AutoCapture: config.AutoCapture, CapturePath: config.CapturePath, SeparateChar: config.SeparateChar, ReturnWindow: config.ReturnWindow, AnimationDuration: config.AnimationDuration, AnimationDelay: config.AnimationDelay})
+		}
+	} else {
+		if Cli == true {
+			outputJson, err = json.Marshal(&configData{Target: config.Target, AutoCapture: config.AutoCapture, CapturePath: config.CapturePath, SeparateChar: config.SeparateChar, LiveExitAsciiCode: config.LiveExitAsciiCode, Shebang: config.Shebang, ExportFormat: config.ExportFormat, Record: config.Record, LoopWait: config.LoopWait})
 		} else {
 			outputJson, err = json.Marshal(&configData{Target: config.Target, AutoCapture: config.AutoCapture, CapturePath: config.CapturePath, SeparateChar: config.SeparateChar})
 		}
@@ -157,60 +165,47 @@ func ConfigToByte(cli bool) []byte {
 	if err != nil {
 		return []byte(fmt.Sprintf("%s", err))
 	}
+
 	return []byte(outputJson)
+}
+
+func catUsecase() string {
+	if runtime.GOOS == "windows" {
+		if Cli == true {
+			return "usecase: CLI(ExportFormat,Shebang,Record)=(strings,strings,boolean). API(ReturnWindow,SeparateChar,Target,AutoCapture,CapturePath,AnimationDuration,AnimationDelay)=(int,char,strings,boolean,strings,int,int)"
+		}
+		return "usecase: API(ReturnWindow,SeparateChar,Target,AutoCapture,CapturePath,AnimationDuration,AnimationDelay)=(int,char,strings,boolean,strings,int,int)"
+	}
+
+	if Cli == true {
+		return "usecase: CLI(ExportFormat,Shebang,Record)=(strings,strings,boolean). API(SeparateChar,Target,AutoCapture,CapturePath)=(char,strings,boolean,strings)"
+
+	}
+	return "usecase: API(SeparateChar,Target,AutoCapture,CapturePath)=(char,strings,boolean,strings)"
 }
 
 func SetOptions(options string) string {
 	params := strings.Split(options, "=")
 
-	if len(params) < 2 || len(options) == 0 {
-		if runtime.GOOS == "windows" {
-			return "usecase: (ReturnWindow,SeparateChar,Target,AutoCapture,CapturePath,AnimationDuration,AnimationDelay)=(int,char,strings,boolean,strings,int,int)"
-		}
-		return "usecase: (SeparateChar,Target,AutoCapture,CapturePath)=(char,strings,boolean,strings)"
+	if len(params) < 2 || len(options) == 0 { return catUsecase() }
+
+	if checkLinuxFunction(params[0]) == true {
+		return "error"
 	}
 
 	switch params[0] {
 	case "AnimationDelay":
-		if runtime.GOOS == "linux" {
-			return "usecase: (SeparateChar,Target,AutoCapture,CapturePath)=(char,strings,boolean,strings)"
-		}
-		cnt, err := strconv.Atoi(params[1])
-		if cnt > 0 && cnt < 10000 && err == nil {
-			config.AnimationDelay = cnt
-			return ""
-		}
-		return "AnimationDelay set failure (usecase [10000 > AnimationDelay=XX {Milliseconds}> 0])."
+		return setRange(&config.AnimationDelay,params[1],0,10000)
 	case "AnimationDuration":
-		if runtime.GOOS == "linux" {
-			return "usecase: (SeparateChar,Target,AutoCapture,CapturePath)=(char,strings,boolean,strings)"
-		}
-		cnt, err := strconv.Atoi(params[1])
-		if cnt > 0 && cnt < 10000 && err == nil {
-			config.AnimationDuration = cnt
-			return ""
-		}
-		return "AnimationDuration set failure (usecase [10000 > AnimationDuration=XX {Milliseconds}> 0])."
+		return setRange(&config.AnimationDuration,params[1],0,10000)
 	case "ReturnWindow":
-		if runtime.GOOS == "linux" {
-			return "usecase: (SeparateChar,Target,AutoCapture,CapturePath)=(char,strings,boolean,strings)"
-		}
-		cnt, err := strconv.Atoi(params[1])
-		if cnt > 0 && cnt < 10000 && err == nil {
-			config.ReturnWindow = cnt
-			return ""
-		}
-		return "ReturnWindow set failure (usecase [ReturnWindow=XX {1-10000 Milliseconds}])"
+		return setRange(&config.ReturnWindow,params[1],0,10000)
 	case "SeparateChar":
-		if len(params[1]) == 1 {
-			config.SeparateChar = params[1]
-			return ""
+		if len(params[1]) != 1 {
+			return "SeparateChar set failure (usecase [SeparateChar=X {single char}])"
 		}
-		return "SeparateChar set failure (usecase [SeparateChar=X {single char}])"
+		config.SeparateChar = params[1]
 	case "Target":
-		if runtime.GOOS == "linux" {
-			return ""
-		}
 		setWindow := winctl.FocusWindow(targetHwnd, cliHwnd, params[1], Debug)
 		if len(params[1]) < 1 || setWindow == 0 {
 			return "Target set failure. you seted title is not found. (usecase [Target=Chrome or XXXXXX])"
@@ -218,27 +213,20 @@ func SetOptions(options string) string {
 		targetHwnd = setWindow
 		config.Target = params[1]
 	case "AutoCapture":
-		if params[1] == "true" {
-			config.AutoCapture = true
-			return ""
-		} else if params[1] == "false" {
-			config.AutoCapture = false
-			return ""
-		} else {
-			return "AutoCapture set failure (usecase [AutoCapture=true/false])"
-		}
+		return setTrueFalse(&config.AutoCapture, params[1])
 	case "CapturePath":
 		if len(params[1]) < 1 {
 			return "CapturePath set failure (usecase [CapturePath=./pictures])"
 		}
 		config.CapturePath = params[1]
-		return ""
 	default:
-		if runtime.GOOS == "windows" {
-			return "usecase: (ReturnWindow,SeparateChar,Target,AutoCapture,CapturePath,AnimationDuration,AnimationDelay)=(int,char,strings,boolean,strings,int,int)"
-		}
-		return "usecase: (SeparateChar,Target,AutoCapture,CapturePath)=(char,strings,boolean,strings)"
+		return "error"
 	}
+
+	if config.Record == true {
+		History = append(History, historyData{Command: "configSet", Params: options})
+	}
+
 	return ""
 }
 

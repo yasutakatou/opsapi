@@ -131,82 +131,82 @@ func TestOptionSetting(t *testing.T) {
 	}
 
 	fmt.Println(" - - - -  api success case - - - -  ")
-	if runtime.GOOS == "windows" && OptionSetting(false, "ReturnWindow=100") == false {
+	if runtime.GOOS == "windows" && OptionSetting("ReturnWindow=100") == false {
 		t.Errorf("ReturnWindow: can't set correct value")
 	}
-	if OptionSetting(false, "SeparateChar=:") == false {
+	if OptionSetting("SeparateChar=:") == false {
 		t.Errorf("SeparateChar: can't set correct value")
 	}
-	if runtime.GOOS == "windows" && OptionSetting(false, "Target=Windows") == false {
+	if runtime.GOOS == "windows" && OptionSetting("Target=Windows") == false {
 		t.Errorf("Target: can't set correct value")
 	}
-	if OptionSetting(false, "AutoCapture=false") == false {
+	if OptionSetting("AutoCapture=false") == false {
 		t.Errorf("AutoCapture: can't set correct value")
 	}
-	if OptionSetting(false, "CapturePath=..\\") == false {
+	if OptionSetting("CapturePath=..\\") == false {
 		t.Errorf("CapturePath: can't set correct value")
 	}
-	if runtime.GOOS == "windows" && OptionSetting(false, "AnimationDuration=1000") == false {
+	if runtime.GOOS == "windows" && OptionSetting("AnimationDuration=1000") == false {
 		t.Errorf("AnimationDuration: can't set correct value")
 	}
-	if runtime.GOOS == "windows" && OptionSetting(false, "AnimationDelay=500") == false {
+	if runtime.GOOS == "windows" && OptionSetting("AnimationDelay=500") == false {
 		t.Errorf("AnimationDelay: can't set correct value")
 	}
 	fmt.Println("")
 
 	fmt.Println(" - - - -  api fail case - - - -  ")
-	if OptionSetting(false, "ReturnWindow=10001") == true {
+	if runtime.GOOS == "windows" && OptionSetting("ReturnWindow=10001") == true {
 		t.Errorf("ReturnWindow: can't detect incorrect value")
 	}
-	if OptionSetting(false, "SeparateChar=[]") == true {
+	if OptionSetting("SeparateChar=[]") == true {
 		t.Errorf("SeparateChar: can't detect incorrect value")
 	}
-	if runtime.GOOS == "windows" && OptionSetting(false, "Target=XXXXXXX") == true {
+	if runtime.GOOS == "windows" && OptionSetting("Target=XXXXXXX") == true {
 		t.Errorf("Target: can't detect incorrect value")
 	}
-	if OptionSetting(false, "AutoCapture=fail") == true {
+	if OptionSetting("AutoCapture=fail") == true {
 		t.Errorf("AutoCapture: can't detect incorrect value")
 	}
-	if OptionSetting(false, "AnimationDuration=0") == true {
+	if runtime.GOOS == "windows" && OptionSetting("AnimationDuration=0") == true {
 		t.Errorf("AnimationDuration: can't detect incorrect value")
 	}
-	if OptionSetting(false, "AnimationDelay=0") == true {
+	if runtime.GOOS == "windows" && OptionSetting("AnimationDelay=0") == true {
 		t.Errorf("AnimationDelay: can't detect incorrect value")
 	}
 	fmt.Println("")
 
 	fmt.Println(" - - - -  cli success case - - - -  ")
-	if OptionSetting(true, "LoopWait=100") == false {
+	if OptionSetting("LoopWait=100") == false {
 		t.Errorf("LoopWait: can't set correct value")
 	}
-	if OptionSetting(true, "LiveExitAsciiCode=32") == false {
+	if runtime.GOOS == "windows" && OptionSetting("LiveExitAsciiCode=32") == false {
 		t.Errorf("LiveExitAsciiCode: can't set correct value")
 	}
-	if OptionSetting(true, "ExportFormat=curl -H \"Content-type: application/json\" -X POST http://127.0.0.1:8080/ -d \"{\\\"token\\\":\\\"%1\\\",\\\"command\\\":\\\"#COMMAND#\\\",\\\"params\\\":\\\"#PARAMS#\\\"}\"") == false {
+	if OptionSetting("ExportFormat=curl -H \"Content-type: application/json\" -X POST http://127.0.0.1:8080/ -d \"{\\\"token\\\":\\\"%1\\\",\\\"command\\\":\\\"#COMMAND#\\\",\\\"params\\\":\\\"#PARAMS#\\\"}\"") == false {
 		t.Errorf("ExportFormat: can't set correct value")
 	}
-	if OptionSetting(true, "Shebang=#!/bin/bash") == false {
+	if OptionSetting("Shebang=#!/bin/bash") == false {
 		t.Errorf("Shebang: can't set correct value")
 	}
-	if OptionSetting(true, "Record=false") == false {
+	if OptionSetting("Record=false") == false {
 		t.Errorf("Record: can't set correct value")
 	}
 	fmt.Println("")
 
 	fmt.Println(" - - - -  cli fail case - - - -  ")
-	if OptionSetting(true, "LoopWait=10001") == true {
+	if OptionSetting("LoopWait=10001") == true {
 		t.Errorf("LoopWait: can't detect incorrect value")
 	}
-	if OptionSetting(true, "LiveExitAsciiCode=200") == true {
+	if OptionSetting("LiveExitAsciiCode=200") == true {
 		t.Errorf("LiveExitAsciiCode: can't detect incorrect value")
 	}
-	if OptionSetting(true, "ExportFormat=curl -H \"Content-type: application/json\" -X POST http://127.0.0.1:8080/ -d \"{\\\"token\\\":\\\"%1\\\",\\\"command\\\":\\\"#CMD#\\\",\\\"params\\\":\\\"#PRM#\\\"}\"") == true {
+	if OptionSetting("ExportFormat=curl -H \"Content-type: application/json\" -X POST http://127.0.0.1:8080/ -d \"{\\\"token\\\":\\\"%1\\\",\\\"command\\\":\\\"#CMD#\\\",\\\"params\\\":\\\"#PRM#\\\"}\"") == true {
 		t.Errorf("ExportFormat: can't detect incorrect value")
 	}
-	if OptionSetting(true, "Shebang=") == true {
+	if OptionSetting("Shebang=") == true {
 		t.Errorf("Shebang: can't detect incorrect value")
 	}
-	if OptionSetting(true, "Record=fail") == true {
+	if OptionSetting("Record=fail") == true {
 		t.Errorf("Record: can't detect incorrect value")
 	}
 	fmt.Println("")

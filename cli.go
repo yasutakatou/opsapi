@@ -32,22 +32,22 @@ func CliHandler(c *ishell.Context) {
 	RunCliCmd(c.Cmd.Name, params)
 }
 
+func AnimetionSwitch(params string) string {
+	if AnimetionGif == false {
+		AnimetionGif = true
+		return CreateAnimationGif(params)
+	}
+	stopCall <- true
+	AnimetionGif = false
+	return ""
+}
+
 func RunCliCmd(command, params string) bool {
 	switch command {
 	case "AnimetionGif":
-		if AnimetionGif == false {
-			fmt.Println(CreateAnimationGif(params))
-			AnimetionGif = true
-			return true
-		}
-		stopCall <- true
-		AnimetionGif = false
+		fmt.Println(AnimetionSwitch(params))
 	case "insertHistory":
-		resp := InsertHistory(params)
-		if resp.Status == "Error" {
-			fmt.Println(resp.Status, resp.Message)
-			return false
-		}
+		return InsertHistory(params)
 	case "runHistory":
 		RunHistory()
 	case "importHistory":
@@ -61,19 +61,11 @@ func RunCliCmd(command, params string) bool {
 	case "deleteHistory":
 		DeleteHistory(params)
 	case "displayHistory":
-		if DisplayHistory() == false {
-			fmt.Println("your history is empty")
-			return false
-		}
-		return true
+		DisplayHistory()
 	case "configGet":
-		fmt.Println(string(ConfigToByte(false)))
-	case "cliConfigGet":
-		fmt.Println(string(ConfigToByte(true)))
+		fmt.Println(string(ConfigToByte()))
 	case "configSet":
-		OptionSetting(false, params)
-	case "cliConfigSet":
-		OptionSetting(true, params)
+		OptionSetting(params)
 	case "exec":
 		fmt.Println(Execmd(params))
 	case "capture":
@@ -87,8 +79,8 @@ func RunCliCmd(command, params string) bool {
 }
 
 func RunHistory() {
-	recordFlag := cliConfig.Record
-	cliConfig.Record = false
+	recordFlag := config.Record
+	config.Record = false
 
 	for i := 0; i < len(History); i++ {
 		fmt.Printf("Run! [%3d] Command: %10s Params: %s\n", i+1, History[i].Command, History[i].Params)
@@ -102,23 +94,25 @@ func RunHistory() {
 		case "ops":
 			StringDo(History[i].Params)
 		}
-		time.Sleep(time.Duration(cliConfig.LoopWait) * time.Millisecond)
+		time.Sleep(time.Duration(config.LoopWait) * time.Millisecond)
 	}
-	cliConfig.Record = recordFlag
+	config.Record = recordFlag
 }
 
-func InsertHistory(ranges string) responseData {
+func InsertHistory(ranges string) bool {
 	if strings.Index(ranges, " ") != -1 {
 		params := strings.Split(ranges, " ")
 		if len(params) == 3 {
 			cnt, err := strconv.Atoi(params[0])
 			if err == nil && cnt > 0 && len(History) >= cnt {
 				History = Insert(History, cnt-1, params[1], params[2])
-				return responseData{Status: "Success", Message: ""}
+				fmt.Println(responseData{Status: "Success", Message: ""})
+				return true
 			}
 		}
 	}
-	return responseData{Status: "Error", Message: "you set value out of range operation historys"}
+	fmt.Println(responseData{Status: "Error", Message: "you set value out of range operation historys"})
+	return false
 }
 
 func DeleteHistory(ranges string) {
@@ -225,8 +219,8 @@ func ExportHistory(params string) bool {
 	}
 	defer file.Close()
 
-	if tsvFormatFlag == false && len(cliConfig.Shebang) > 0 {
-		_, err = file.WriteString(cliConfig.Shebang + "\n\n")
+	if tsvFormatFlag == false && len(config.Shebang) > 0 {
+		_, err = file.WriteString(config.Shebang + "\n\n")
 		if err != nil {
 			fmt.Println(err)
 			return false
@@ -236,7 +230,7 @@ func ExportHistory(params string) bool {
 	for i := 0; i < len(History); i++ {
 		strs := ""
 		if tsvFormatFlag == false {
-			strs = strings.Replace(cliConfig.ExportFormat, "#COMMAND#", History[i].Command, 1)
+			strs = strings.Replace(config.ExportFormat, "#COMMAND#", History[i].Command, 1)
 			strs = strings.Replace(strs, "#PARAMS#", History[i].Params, 1)
 		} else {
 			strs = History[i].Command + "\t" + History[i].Params
@@ -259,8 +253,8 @@ func SetExportFormat(params string) bool {
 	if len(params) == 0 || strings.Index(params, "#COMMAND#") == -1 || strings.Index(params, "#PARAMS#") == -1 {
 		return false
 	}
-	cliConfig.ExportFormat = params
-	fmt.Println("ExportFormat: ", cliConfig.ExportFormat)
+	config.ExportFormat = params
+	fmt.Println("ExportFormat: ", config.ExportFormat)
 	return true
 }
 
@@ -268,33 +262,45 @@ func SetShebang(params string) bool {
 	if len(params) == 0 {
 		return false
 	}
-	cliConfig.Shebang = params
-	fmt.Println("Shebang: ", cliConfig.Shebang)
+	config.Shebang = params
+	fmt.Println("Shebang: ", config.Shebang)
 	return true
+}
+
+func setRange(setint *int, valString string, min,max int) string {
+	cnt, err := strconv.Atoi(valString)
+	if cnt > min && cnt < max && err == nil {
+		*setint = cnt
+		return ""
+	}
+	return fmt.Sprintf("value set failure (usecase [%d > value=XX > %d]).",max,min)
+}
+
+func setTrueFalse(truefalse *bool, strs string) string {
+	if strs == "true" {
+		*truefalse = true
+		return ""
+	}
+	
+	if strs == "false" {
+		*truefalse = false
+		return ""
+	}
+	return "value set failure (usecase [value=true/false])"
 }
 
 func SetCliOptions(options string) string {
 	params := strings.Split(options, "=")
 
 	if len(params) < 2 || len(options) == 0 {
-		return "usecase: (ExportFormat,Shebang,Record)=(strings,strings,boolean)."
+		return "error"
 	}
 
 	switch params[0] {
 	case "LoopWait":
-		cnt, err := strconv.Atoi(params[1])
-		if cnt > 0 && cnt < 10000 && err == nil {
-			cliConfig.LoopWait = cnt
-			return ""
-		}
-		return "Error: LoopWait set failure (usecase [10000 > LoopWait=XX {Milliseconds}> 0])."
+		return setRange(&config.LoopWait,params[1],0,10000)
 	case "LiveExitAsciiCode":
-		cnt, err := strconv.Atoi(params[1])
-		if cnt > 0 && cnt < 127 && err == nil {
-			cliConfig.LiveExitAsciiCode = cnt
-			return ""
-		}
-		return "Error: LiveExitAsciiCode set failure (usecase [127 > LiveExitAsciiCode=XX {Ascii Code}> 0])."
+		return setRange(&config.LiveExitAsciiCode,params[1],0,127)
 	case "ExportFormat":
 		if SetExportFormat(params[1]) == false {
 			return "you set value is empty, or invalid value {include #COMMAND# and #PARAMS# ?}"
@@ -304,15 +310,9 @@ func SetCliOptions(options string) string {
 			return "you set value is empty, or invalid value"
 		}
 	case "Record":
-		if params[1] == "true" {
-			cliConfig.Record = true
-			return ""
-		} else if params[1] == "false" {
-			cliConfig.Record = false
-			return ""
-		} else {
-			return "Record set failure (usecase [Record=true/false])"
-		}
+		return setTrueFalse(&config.Record, params[1])
+	default:
+		return "error"
 	}
 	return ""
 }

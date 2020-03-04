@@ -62,11 +62,6 @@ type configData struct {
 	AnimationDuration int    `json:"AnimationDuration"`
 	AnimationDelay    int    `json:"AnimationDelay"`
 	vcsDevice         string `json:"Target"`
-}
-
-var config = configData{}
-
-type cliConfigData struct {
 	LiveExitAsciiCode int    `json:"LiveExitAsciiCode"`
 	Shebang           string `json:"Shebang"`
 	ExportFormat      string `json:"ExportFormat"`
@@ -74,7 +69,7 @@ type cliConfigData struct {
 	LoopWait          int    `json:"LoopWait"`
 }
 
-var cliConfig = cliConfigData{}
+var config = configData{}
 
 type historyData struct {
 	Command string `json:"Command"`
@@ -111,11 +106,11 @@ func init() {
 	Cli = false
 	AnimetionGif = false
 
-	cliConfig.LiveExitAsciiCode = 27
-	cliConfig.Shebang = ""
-	cliConfig.ExportFormat = "curl -H \"Content-type: application/json\" -X POST http://127.0.0.1:8080/ -d \"{\\\"token\\\":\\\"%1\\\",\\\"command\\\":\\\"#COMMAND#\\\",\\\"params\\\":\\\"#PARAMS#\\\"}\""
-	cliConfig.Record = true
-	cliConfig.LoopWait = 500
+	config.LiveExitAsciiCode = 27
+	config.Shebang = ""
+	config.ExportFormat = "curl -H \"Content-type: application/json\" -X POST http://127.0.0.1:8080/ -d \"{\\\"token\\\":\\\"%1\\\",\\\"command\\\":\\\"#COMMAND#\\\",\\\"params\\\":\\\"#PARAMS#\\\"}\""
+	config.Record = true
+	config.LoopWait = 500
 }
 
 func main() {
@@ -163,8 +158,8 @@ func main() {
 		StartAPI(*_https, *_port, *_cert, *_key)
 	}
 
-	fmt.Println("Shebang: ", cliConfig.Shebang)
-	fmt.Println("ExportFormat: ", cliConfig.ExportFormat)
+	fmt.Println("Shebang: ", config.Shebang)
+	fmt.Println("ExportFormat: ", config.ExportFormat)
 
 	var shell = ishell.New()
 
@@ -216,20 +211,12 @@ func main() {
 		Help: "this option display your operation history",
 		Func: CliHandler})
 
-	shell.AddCmd(&ishell.Cmd{Name: "cliConfigGet",
-		Help: "cli config option are display",
-		Func: CliHandler})
-
-	shell.AddCmd(&ishell.Cmd{Name: "cliConfigSet",
-		Help: "usecase: (LoopWait,ExportFormat,shebang,record)=(int,strings,strings,boolean).",
-		Func: CliHandler})
-
 	shell.AddCmd(&ishell.Cmd{Name: "configGet",
-		Help: "config option are display",
+		Help: "this options display config option",
 		Func: CliHandler})
 
 	shell.AddCmd(&ishell.Cmd{Name: "configSet",
-		Help: "usecase: (SeparateChar,Target,AutoCapture,CapturePath)=(char,strings,boolean,strings)",
+		Help: "this options set config option",
 		Func: CliHandler})
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -260,24 +247,39 @@ func Exists(filename string) bool {
 	return err == nil
 }
 
-func OptionSetting(cli bool, params string) bool {
-	if cli == true {
-		ret := SetCliOptions(params)
-		if ret == "" {
-			fmt.Println(string(ConfigToByte(cli)))
-			return true
-		}
-		fmt.Println(ret)
+func OptionSetting(params string) bool {
+	cliRet := SetCliOptions(params)
+	apiRet := SetOptions(params)
+
+	if cliRet == "error" && apiRet == "error" {
+		catUsecase()
 		return false
 	}
 
-	ret := SetOptions(params)
-	if ret == "" {
-		fmt.Println(string(ConfigToByte(cli)))
-		return true
-	}
-	fmt.Println(ret)
+	if apiRet != "" { fmt.Println(cliRet) }
+	if cliRet != "" { fmt.Println(apiRet) }
+
+	if cliRet == "" { return true }
+	if apiRet == "" { return true }
+
 	return false
+}
+
+func LoopChangeTarget(setHwnd uintptr) bool {
+	breakCounter := 10
+
+	for {
+		if setHwnd != winctl.GetWindow("GetForegroundWindow", Debug) {
+			winctl.SetActiveWindow(winctl.HWND(setHwnd), Debug)
+			time.Sleep(time.Duration(100) * time.Millisecond)
+		} else {
+			return true
+		}
+		breakCounter--
+		if breakCounter == 0 {
+			return false
+		}
+	}
 }
 
 func ChangeTarget(setHwnd uintptr) bool {
@@ -285,36 +287,13 @@ func ChangeTarget(setHwnd uintptr) bool {
 		return false
 	}
 
-	breakCounter := 10
-
-	for {
-		if cliHwnd != winctl.GetWindow("GetForegroundWindow", Debug) {
-			winctl.SetActiveWindow(winctl.HWND(cliHwnd), Debug)
-			time.Sleep(time.Duration(100) * time.Millisecond)
-		} else {
-			break
-		}
-		breakCounter--
-		if breakCounter == 0 {
-			break
-		}
+	if LoopChangeTarget(cliHwnd) == false {
+		return false
 	}
 
-	breakCounter = 10
-
-	for {
-		if setHwnd != winctl.GetWindow("GetForegroundWindow", Debug) {
-			winctl.SetActiveWindow(winctl.HWND(setHwnd), Debug)
-			time.Sleep(time.Duration(100) * time.Millisecond)
-		} else {
-			break
-		}
-		breakCounter--
-		if breakCounter == 0 {
-			return false
-		}
+	if LoopChangeTarget(setHwnd) == false {
+		return false
 	}
-
 	return true
 }
 
@@ -361,7 +340,7 @@ func StringDo(doCmd string) bool {
 		}
 	}
 
-	if Cli == true && cliConfig.Record == true {
+	if Cli == true && config.Record == true {
 		History = append(History, historyData{Command: "ops", Params: doCmd})
 	}
 	return true
@@ -419,6 +398,10 @@ func Execmd(command string) []byte {
 				return
 			}
 
+			if Debug == true {
+				fmt.Printf("%s", string(out))
+			}
+
 			if config.AutoCapture == true {
 				t := time.Now()
 				const layout = "2006-01-02-15-04-05"
@@ -445,11 +428,11 @@ func Execmd(command string) []byte {
 				fmt.Println(err)
 			}
 			if Debug == true {
-				fmt.Printf("Stdout: %s\n", string(out))
+				fmt.Printf("%s", string(out))
 			}
 		}()
 	}
-	if Cli == true && cliConfig.Record == true {
+	if Cli == true && config.Record == true {
 		History = append(History, historyData{Command: "exec", Params: command})
 	}
 	return out
@@ -458,7 +441,7 @@ func Execmd(command string) []byte {
 func CaptureOnly(filename string) string {
 	ret := ""
 
-	if Cli == true && cliConfig.Record == true {
+	if Cli == true && config.Record == true {
 		History = append(History, historyData{Command: "capture", Params: filename})
 	}
 

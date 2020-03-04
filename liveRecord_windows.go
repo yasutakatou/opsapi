@@ -9,7 +9,7 @@ import (
 )
 
 func LiveRecord() {
-	fmt.Printf(" - - live recording! you want to end this mode, key press ascii code (%d) - - \n", cliConfig.LiveExitAsciiCode)
+	fmt.Printf(" - - live recording! you want to end this mode, key press ascii code (%d) - - \n", config.LiveExitAsciiCode)
 
 	altFlag := 0
 
@@ -26,7 +26,7 @@ func LiveRecord() {
 				} else {
 					altFlag = 0
 				}
-			case cliConfig.LiveExitAsciiCode: //Default Escape
+			case config.LiveExitAsciiCode: //Default Escape
 				return
 			}
 		}
@@ -54,7 +54,7 @@ func LiveRecord() {
 				}
 			}
 
-			if len(strs) > 0 && targetHwnd == winctl.GetWindow("GetForegroundWindow", Debug) && cliConfig.Record == true {
+			if len(strs) > 0 && targetHwnd == winctl.GetWindow("GetForegroundWindow", Debug) && config.Record == true {
 				History = append(History, historyData{Command: "ops", Params: strs})
 				if Debug == true {
 					fmt.Println("liveRecord: ", strs)
