@@ -116,6 +116,9 @@ functions is almost supported Windows and Linux. but, "liveRecord" "AnimetionGIF
 
 ### "ops":
  keyboard emulation. argument is input strings by keyboard.<br>
+ 
+*note: in what Windows, keyboard emulate on target window. in what Linux,  keyboard emulate on terminal console (/dev/ttyX such). therefore, must permted permisson to /dev/ttyX.*
+
 example) [ops test] (keyboard emulaton to your terminal. input "test")<br>
 *note: when running cli mode. and when your inputs aren't functions. your inputs are treat to "ops".*<br>
 
