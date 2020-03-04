@@ -51,6 +51,8 @@ delete that binary. del or rm command. (it's simple!)
 if you don't know, cli mode help you. you can test operation  on cli. or liveRecord mode make your operation into code in auto.<br>
 cli mode can use like linux shell. tab interpolation, upper key is history one before, etc. <br>
 
+![cli](https://github.com/yasutakatou/opsapi/blob/pic/cli_mode.gif)
+
 this tool run example in local. token is test. execute command on our OS for get file lists.<br>
 
 ```
@@ -112,7 +114,7 @@ functions is almost supported Windows and Linux. but, "liveRecord" "AnimetionGIF
 
 ### "configSet":
  config value change. you can set value one by one. format is left(option name)=right(value).
- each value detail are ["config" reference]().
+ each value detail are ["config" reference](https://github.com/yasutakatou/opsapi#config).
 
 ### "ops":
  keyboard emulation. argument is input strings by keyboard.<br>
@@ -159,13 +161,6 @@ if omit argument, filename is current year-month-days-hour-minits. example: now 
 
 ### "clearHistory": (CLI only)
  history is cleared
-
-### "cliConfigGet": (CLI only)
- view current cli config for cli. argument isn't need.  
-
-### "cliConfigSet": (CLI only)
- cli config value change for cli. you can set value one by one. format is left(option name)=right(value).<br>
-each value detail are "cli config" reference. 
 
 ### "deleteHistory": (CLI only)
  delete history one or more. argumet is single integer or use "-" range integer value.<br>
@@ -221,7 +216,7 @@ note: when "runHistory" running, not add history.
 *note: if space string include, refer following.*
 
 ```
->>> cliConfigSet Shebang="## space string include example ##"
+>>> configSet Shebang="## space string include example ##"
 ```
 
 ### "Target" (default: "Chrome". exists window title, or handle id.)
@@ -255,7 +250,7 @@ input are "hoge" , newline , (10 second waits), "fuga"
 ### "AnimationDelay" (default "50". 0 < value < 10000.)
  gif animation play delay time. The smaller, the fastest the playing.
 
-## cli config
+## config for cli
 
 ### "LiveExitAsciiCode (default "27")
 "liveRecord" function wait this value ascii code for recording exit.<br>
@@ -280,7 +275,7 @@ curl -H "Content-type: application/json" -X POST http://127.0.0.1:8080/ -d "{\"t
 ```
 
 ### "Record" (default true. true or false)
- if this value is true, record history every inputs. if you want to set true this, you input [cliConfigSet Record=true].
+ if this value is true, record history every inputs. if you want to set true this, you input [configSet Record=true].
 
 ### "LoopWait" (defalut "500". 0 < value < 10000.)
  "runHistory" function wait this value every do. program waits xx integer milli second. 
