@@ -200,11 +200,10 @@ func SetOptions(options string) string {
 		return setRange(&config.AnimationDuration,params[1],0,10000)
 	case "ReturnWindow":
 		return setRange(&config.ReturnWindow,params[1],0,10000)
+	case "LiveRawcodeChar":
+		return setSingleChar(&config.LiveRawcodeChar, params[1])
 	case "SeparateChar":
-		if len(params[1]) != 1 {
-			return "SeparateChar set failure (usecase [SeparateChar=X {single char}])"
-		}
-		config.SeparateChar = params[1]
+		return setSingleChar(&config.SeparateChar, params[1])
 	case "Target":
 		setWindow := winctl.FocusWindow(targetHwnd, cliHwnd, params[1], Debug)
 		if len(params[1]) < 1 || setWindow == 0 {

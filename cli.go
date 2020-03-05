@@ -231,7 +231,8 @@ func ExportHistory(params string) bool {
 		strs := ""
 		if tsvFormatFlag == false {
 			strs = strings.Replace(config.ExportFormat, "#COMMAND#", History[i].Command, 1)
-			strs = strings.Replace(strs, "#PARAMS#", History[i].Params, 1)
+			params = strings.Replace(History[i].Params, "\\", "\\\\", -1)
+			strs = strings.Replace(strs, "#PARAMS#", params, 1)
 		} else {
 			strs = History[i].Command + "\t" + History[i].Params
 		}
@@ -274,6 +275,14 @@ func setRange(setint *int, valString string, min,max int) string {
 		return ""
 	}
 	return fmt.Sprintf("value set failure (usecase [%d > value=XX > %d]).",max,min)
+}
+
+func setSingleChar(singleChar *string, strs string) string {
+	if len(strs) != 1 {
+		return "value set failure (usecase [value=X {single char}])"
+	}
+	*singleChar = strs
+	return ""
 }
 
 func setTrueFalse(truefalse *bool, strs string) string {

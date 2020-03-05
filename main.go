@@ -63,6 +63,7 @@ type configData struct {
 	AnimationDelay    int    `json:"AnimationDelay"`
 	vcsDevice         string `json:"Target"`
 	LiveExitAsciiCode int    `json:"LiveExitAsciiCode"`
+	LiveRawcodeChar   string `json:"LiveRawcodeChar"`
 	Shebang           string `json:"Shebang"`
 	ExportFormat      string `json:"ExportFormat"`
 	Record            bool   `json:"Record"`
@@ -97,10 +98,11 @@ func init() {
 	config.AutoCapture = false
 	config.CapturePath = ""
 	config.SeparateChar = ";"
-	config.ReturnWindow = 1000
+	config.ReturnWindow = 100
 	config.AnimationDuration = 250
 	config.AnimationDelay = 50
 	config.vcsDevice = "/dev/vcs1"
+	config.LiveRawcodeChar = "~"
 
 	Debug = false
 	Cli = false
@@ -110,7 +112,7 @@ func init() {
 	config.Shebang = ""
 	config.ExportFormat = "curl -H \"Content-type: application/json\" -X POST http://127.0.0.1:8080/ -d \"{\\\"token\\\":\\\"%1\\\",\\\"command\\\":\\\"#COMMAND#\\\",\\\"params\\\":\\\"#PARAMS#\\\"}\""
 	config.Record = true
-	config.LoopWait = 500
+	config.LoopWait = 100
 }
 
 func main() {
@@ -374,7 +376,7 @@ func SendKey(doCmd string) bool {
 		}
 	}
 
-	string2keyboard.KeyboardWrite(doCmd, cCtrl, cAlt)
+	string2keyboard.KeyboardWrite(doCmd, cCtrl, cAlt, config.LiveRawcodeChar)
 	if Debug == true {
 		fmt.Println(doCmd, cCtrl, cAlt)
 	}

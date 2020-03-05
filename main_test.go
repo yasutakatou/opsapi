@@ -191,6 +191,9 @@ func TestOptionSetting(t *testing.T) {
 	if OptionSetting("Record=false") == false {
 		t.Errorf("Record: can't set correct value")
 	}
+	if OptionSetting("LiveRawcodeChar=-") == false {
+		t.Errorf("LiveRawcodeChar: can't set correct value")
+	}
 	fmt.Println("")
 
 	fmt.Println(" - - - -  cli fail case - - - -  ")
@@ -208,6 +211,9 @@ func TestOptionSetting(t *testing.T) {
 	}
 	if OptionSetting("Record=fail") == true {
 		t.Errorf("Record: can't detect incorrect value")
+	}
+	if OptionSetting("LiveRawcodeChar=()") == true {
+		t.Errorf("LiveRawcodeChar: can't detect incorrect value")
 	}
 	fmt.Println("")
 
