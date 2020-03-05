@@ -139,7 +139,7 @@ example) [ops test] (keyboard emulaton to your terminal. input "test")<br>
 |\\\\"|double quote|
 
 and can use **integer among LiveRawcodeChar value to ascii code emulate**.
-example [\\~38~; \\~38~] <br>
+example [\\\~38\~; \\\~38\~] <br>
 in case of LiveRawcodeChar value is "~"(default).input are double "↑". <br>
 
 *note: by what "SeparateChar" define, strings can input Continuously.*<br>
@@ -250,7 +250,7 @@ input are "hoge" , newline , (10 second waits), "fuga"
 ### "LiveRawcodeChar" (default "~". single character.)
 when use "ops" function, can input ascii code among this value.<br>
 about ascii code, please refer [this site](http://shanabrian.com/web/javascript/keycode.php).<br>
-example [\\~38~; \\~38~] <br>
+example [\\\~38\~; \\\~38\~] <br>
 input are double "↑".
 
 ### "ReturnWindow" (default "100". 0 < value < 10000.)
