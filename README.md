@@ -138,6 +138,10 @@ example) [ops test] (keyboard emulaton to your terminal. input "test")<br>
 |\\\\t|tab|
 |\\\\"|double quote|
 
+and can use **integer among LiveRawcodeChar value to ascii code emulate**.
+example [\\~38~; \\~38~] <br>
+in case of LiveRawcodeChar value is "~"(default).input are double "↑". <br>
+
 *note: by what "SeparateChar" define, strings can input Continuously.*<br>
 example [hoge; \\n ; wait10; fuga] -> input are "hoge" , newline , (10 second waits), "fuga"<br>
 waitXX is embedded sleep function. program waits xx integer second. 
@@ -235,13 +239,19 @@ this option, capture target window after "ops" every. detail wrote in "capture" 
 *note: filename is current year-month-days-hour-minits fixed. example: now  2020/03/01 22:08 -> 2020-03-01-22-08. *<br>
 if you want to set true this, you input [configSet AutoCapture=true].
 
-### "CapturePath" (default "" note. empty. file path.)
+### "CapturePath" (default "" [empty] file path.)
  can set save path, when you use capturing function.
 
 ### "SeparateChar" (default ";". single character.)
 when use "ops" function, use this value strings can input Continuously.<br>
 example [hoge; \\n ; wait10; fuga] <br>
 input are "hoge" , newline , (10 second waits), "fuga"
+
+### "LiveRawcodeChar" (default "~". single character.)
+when use "ops" function, can input ascii code among this value.<br>
+about ascii code, please refer [this site](http://shanabrian.com/web/javascript/keycode.php).<br>
+example [\\~38~; \\~38~] <br>
+input are double "↑".
 
 ### "ReturnWindow" (default "100". 0 < value < 10000.)
  when "AutoCapture" is true, wait this value after capture. program waits xx integer milli second. 
@@ -256,9 +266,9 @@ input are "hoge" , newline , (10 second waits), "fuga"
 
 ### "LiveExitAsciiCode (default "27")
 "liveRecord" function wait this value ascii code for recording exit.<br>
-about ascii code, please refer [this site](https://www.ascii-code.com/).
+about ascii code, please refer [this site](http://shanabrian.com/web/javascript/keycode.php).
 
-### "Shebang"  (default "" note. empty)
+### "Shebang"  (default "" [empty])
 if you use Shebang, set this value.<br>
 example) Shebang=#!/bin/bash
 
