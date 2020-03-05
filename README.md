@@ -3,6 +3,8 @@
 
  **OpsApi** is operation automation tool by *CLI* and *REST API*. not need environment set up, one binary solution! for Windows and Linux.
 
+![demo](https://github.com/yasutakatou/opsapi/blob/pic/demo.gif)
+
 ## solution
 
  when you must boring web task(ex meny registration made of checkbox!), or input for monthly bussiness imfomation.<br> you should many input by human operation. and your team mate same. usual solution are
@@ -241,7 +243,7 @@ when use "ops" function, use this value strings can input Continuously.<br>
 example [hoge; \\n ; wait10; fuga] <br>
 input are "hoge" , newline , (10 second waits), "fuga"
 
-### "ReturnWindow" (default "1000". 0 < value < 10000.)
+### "ReturnWindow" (default "100". 0 < value < 10000.)
  when "AutoCapture" is true, wait this value after capture. program waits xx integer milli second. 
 
 ### "AnimationDuration" (default "250". 0 < value < 10000.)
@@ -277,7 +279,7 @@ curl -H "Content-type: application/json" -X POST http://127.0.0.1:8080/ -d "{\"t
 ### "Record" (default true. true or false)
  if this value is true, record history every inputs. if you want to set true this, you input [configSet Record=true].
 
-### "LoopWait" (defalut "500". 0 < value < 10000.)
+### "LoopWait" (defalut "100". 0 < value < 10000.)
  "runHistory" function wait this value every do. program waits xx integer milli second. 
 
 ## consideration
@@ -293,7 +295,3 @@ not impossible to use external command (FFmpeg such more), but I don't like.<br>
  - see to real time operating screen from remote  client (such use websocket).
 
 if you do that, I suggest to use RDP, VNC.
-
- -  implement special keycode. (Upper, Lower, Right, Left, Page Up/Dn...)
-
-in case of in browser control,  when use scroll, lower key not, space key is not it?  that's why. (may be my misunderstanding)
