@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"runtime"
 
 	"github.com/yasutakatou/ishell"
 )
@@ -231,8 +232,11 @@ func ExportHistory(params string) bool {
 		strs := ""
 		if tsvFormatFlag == false {
 			strs = strings.Replace(config.ExportFormat, "#COMMAND#", History[i].Command, 1)
-			params = strings.Replace(History[i].Params, "\\", "\\\\", -1)
-			strs = strings.Replace(strs, "#PARAMS#", params, 1)
+			if runtime.GOOS == "windows" {
+				strs = strings.Replace(strs, "#PARAMS#", strings.Replace(History[i].Params, "\\", "\\\\", -1), 1)
+			} else {
+				strs = strings.Replace(strs, "#PARAMS#", History[i].Params, 1)
+			}
 		} else {
 			strs = History[i].Command + "\t" + History[i].Params
 		}
