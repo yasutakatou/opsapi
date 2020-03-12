@@ -87,6 +87,28 @@ Windows example:
 curl -k -H "Content-type: application/json" -X POST https://192.168.0.1:18080/ -d "{\"token\":\"custompassword\",\"command\":\"exec\",\"params\":\"dir\"}"
 ```
 
+### if you upload or download file, can use "upload" or "download" api.
+
+*note: two api not use json. use form format.*
+
+in case of you upload text.txt to target server, follow.
+name is file name of upload file into target server, file is data to be uploaded file.
+
+Windows example:
+```
+curl -F token=test -F name=test.txt -F file=@test.txt  http://127.0.0.1:8080/upload
+```
+
+*note: you must spec "@" ago file name.*
+
+in case of you download text.txt, follow.
+name is file name of download file from target server, after -o is file name into download data.
+
+Windows example:
+```
+curl -F token=test -F name=test.txt http://127.0.0.1:8080/download -o test.txt
+```
+
 ## boot parameters
 
 ```
